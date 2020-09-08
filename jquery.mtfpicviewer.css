@@ -61,7 +61,6 @@
     border-radius: 50%;
     background-color: #333;
     opacity: .75;
-    
 }
 .mtf-dot-indicator .current::before {
     background-color: #fff;

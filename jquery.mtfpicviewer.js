@@ -38,7 +38,6 @@
                     }, 250);
                 });
 
-
                 $picViewer.on('mousedown touchstart', function(e) {
                     var ts = e.originalEvent.touches, $img = $picList.children('.current').children('img'), isMove = false;
                         if (ts && ts.length === 2) {// 双指缩放
@@ -61,29 +60,34 @@
                                     x = getXY(e, 'x'), y = getXY(e, 'y'), scale = $img.data('scale') || 1, isMoving = true;
                                     xDistance = x - startPos.x, yDistance = y - startPos.y;
                                     if (xDistance || yDistance) {
-                                        if (yDistance < 0 && imgPosTop < 0) {
-                                            $img.css('top', Math.min(imgPosTop - yDistance * scale, 0) + 'px');
-                                        } else if (yDistance > 0 && imgPosTop > imgMinTop) {
-                                            $img.css('top', Math.max(imgPosTop - yDistance * scale, imgMinTop) + 'px');
-                                        }
-                                        if (xDistance < 0 && imgPosLeft < 0) {
-                                            $img.css('left', Math.min(imgPosLeft - xDistance * scale * 2, 0) + 'px');
-                                        } else if (xDistance > 0 && imgPosLeft > imgMinLeft + 1) {
-                                            $img.css('left', Math.max(imgPosLeft - xDistance * scale * 2, imgMinLeft) + 'px');
-                                        } else {
-                                            $picList.css('marginLeft', marginLeft - xDistance + 'px');
+                                        if (scale > 1) {
+                                            if (yDistance < 0 && imgPosTop < 0) {
+                                                $img.css('top', Math.min(imgPosTop - yDistance * scale, 0) + 'px');
+                                            } else if (yDistance > 0 && imgPosTop > imgMinTop) {
+                                                $img.css('top', Math.max(imgPosTop - yDistance * scale, imgMinTop) + 'px');
+                                            }
+                                            if (xDistance < 0 && imgPosLeft < 0) {
+                                                $img.css('left', Math.min(imgPosLeft - xDistance * scale * 2, 0) + 'px');
+                                            } else if (xDistance > 0 && imgPosLeft > imgMinLeft + 1) {
+                                                $img.css('left', Math.max(imgPosLeft - xDistance * scale * 2, imgMinLeft) + 'px');
+                                            } else {
+                                                isMoving = false;
+                                            }
+                                        } else {  
                                             isMoving = false;
                                         }
                                         if (isMoving) {
                                             startPos.x = x;
                                             startPos.y = y;
+                                        } else {
+                                            $picList.css('marginLeft', marginLeft - xDistance + 'px');
                                         }
                                         isMove = true;
                                     }
                             }
                         }, 36));
                         $(window).on('mouseup touchend', function() {
-                            var index = Math.round(- parseInt($picList.css('marginLeft')) / $picList.width() + (xDistance < 0 && -.35 || xDistance > 0 && .25));
+                            var index = Math.round(- parseInt($picList.css('marginLeft')) / $picList.width() + (xDistance < 0 && -.35 || xDistance > 0 && .25 || 0));
                             if(isMove) {
                                 setTimeout(function() {
                                     clearTimeout(clickTimer);
@@ -129,7 +133,7 @@
             return false;
           });
         })
-        $picList.css({'marginLeft': - currentIndex * 100 + '%'});
+        $picList.css('marginLeft', - currentIndex * 100 + '%');
         // 从触发事件的图片开始放大
         if ($target.length === 1 && $target[0].tagName === 'IMG') {
           var scrollTop = $(window).scrollTop(), top = $target.offset().top - scrollTop, left = $target.offset().left;
@@ -189,7 +193,7 @@
     $.fn.mtfpicviewer.go = function (index) {
         var $current = $picList.children('.current'), currentIndex = $current.index();
         index = Math.max(0, Math.min(index, imgsLen - 1));
-        $picList.animate({'marginLeft': - index * 100 + '%'}, 500);
+        $picList.stop(true, true).animate({'marginLeft': - index * 100 + '%'}, 300);
         $picList.children('div').eq(index).addClass('current').siblings().removeClass('current');
         $dotIndicator.children('div').eq(index).addClass('current').siblings().removeClass('current');
         if (index !== currentIndex) {
