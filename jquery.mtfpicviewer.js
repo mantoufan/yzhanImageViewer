@@ -40,6 +40,7 @@
                 }
 
                 function onMoveStartPicViewer(e) {
+                    e.preventDefault(); // 防止滚动穿透
                     var $img = $picList.children('.current').children('img'), ts = e.originalEvent.touches, movedDistance = {x: 0, y: 0},
                         start = {
                             $img: $img,
