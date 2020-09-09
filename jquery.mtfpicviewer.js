@@ -7,14 +7,16 @@
         debug = false,
         imgsLen = 0,
         $container = null,
-        maxWidth = 'none';
+        maxWidth = 'none',
+        selector = 'img',
+        attrSelector = 'src'
         
     $.fn.extend({
         "mtfpicviewer": function (opt) {
-            var selector = opt.selector || 'img',
-                attrSelector = opt.attrSelector || 'src',
-                parentSelector = opt.parentSelector;
+            var parentSelector = opt.parentSelector;
 
+                opt.selector && (selector = opt.selector);
+                opt.attrSelector && (attrSelector = opt.attrSelector);
                 $container = this;
                 maxWidth = opt.maxWidth || 'none';
                 debug = opt.debug;
@@ -167,7 +169,7 @@
      * 还原：raw
      */
     $.fn.mtfpicviewer.raw = function () {
-        var $target = $container.find('img[src="' + $picList.children('.current').children('img').attr('src') + '"]');
+        var $target = $container.find(selector + '[' + attrSelector + '="' + $picList.children('.current').children('img').attr('src') + '"]');
         if ($target.length === 1) {
             var scrollTop = $(window).scrollTop(), top = $target.offset().top - scrollTop, left = $target.offset().left;
                 $picViewer.css({
