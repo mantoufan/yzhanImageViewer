@@ -43,6 +43,7 @@
     bottom: 10%;
     left: 50%;
     transform: translateX(-50%);
+    text-align: center;
 }
 .mtf-dot-indicator div {
     position: relative;
@@ -52,6 +53,7 @@
     line-height: 12pt;
     text-align: center;
     cursor: pointer;
+    opacity: .85;
 }
 .mtf-dot-indicator div::before {
     content: ' ';
