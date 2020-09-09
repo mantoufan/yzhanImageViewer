@@ -31,7 +31,7 @@
                     $.fn.mtfpicviewer.zoome($current.attr(opt.attrSelector), imgUrls);
                     $picViewer.off('click').on('click', onClickPicViewer);
                     $picViewer.off('mousedown touchstart mousemove').on('mousedown touchstart', onMoveStartPicViewer);
-                    $picList.off('dblclick mousemove touchstart').on('mousemove touchstart', throttle(displayControl, 99, true)).on('dblclick', 'div', onDblclickPicList);
+                    $picList.off('dblclick mousemove touchend').on('mousemove touchend', throttle(displayControl, 99, true)).on('dblclick', 'div', onDblclickPicList);
                     displayControl(e, true);
                     $switchPrev.off('click').on('click', switchGo);
                     $switchNext.off('click').on('click', switchGo);
@@ -363,19 +363,10 @@
      */
     function preventRollThrough(prevent) {
         if (prevent) {
-            data.bodyPosition = $('body').css('position');
-            data.bodyMarginTop = $('body').css('margin-top');
-            data.windowScrollTop = $(window).scrollTop();
-            $('body').css({
-                'position': 'fixed',
-                'margin-top': - data.windowScrollTop + 'px'
-            });
+            data.bodyOverflow = $('body').css('overflow');
+            $('body').css('overflow', 'hidden');
         } else {
-            $('body').css({
-                'position': data.bodyPosition || 'static',
-                'margin-top': data.bodyMarginTop
-            });
-            $(window).scrollTop(data.windowScrollTop || 0);
+            $('body').css('overflow', data.bodyOverflow);
         }
     }
     $('body').append($picViewerBg).append($picViewer);
