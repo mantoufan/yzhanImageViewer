@@ -3,8 +3,10 @@
         $picViewerBg = $('<div>').addClass('mtf-pic-viewer-bg'),
         $picList = $('<div>').addClass('mtf-pic-list').appendTo($picViewer),
         $dotIndicator = $('<div>').addClass('mtf-dot-indicator').appendTo($picViewer),
-        $debug = $('<div>').addClass('mtf-debug').appendTo($picViewer);
-        
+        $debug = $('<div>').addClass('mtf-debug').appendTo($picViewer),
+        $switchPrev = $('<div>').addClass('mtf-pic-switch mtf-pic-switch-prev').appendTo($picViewer),
+        $switchNext = $('<div>').addClass('mtf-pic-switch mtf-pic-switch-next').appendTo($picViewer)
+
     $.fn.extend({
         "mtfpicviewer": function (opt) {
             var opt = {
@@ -27,8 +29,11 @@
                     opt.debug ? $debug.show() : $debug.hide();
                     $.fn.mtfpicviewer.zoome($current.attr(opt.attrSelector), imgUrls);
                     $picViewer.off('click').on('click', onClickPicViewer);
-                    $picViewer.off('mousedown touchstart').on('mousedown touchstart', onMoveStartPicViewer);
-                    $picList.off('dblclick').on('dblclick', 'div', onDblclickPicList);
+                    $picViewer.off('mousedown touchstart mousemove').on('mousedown touchstart', onMoveStartPicViewer);
+                    $picList.off('dblclick mousemove touchstart').on('dblclick', 'div', onDblclickPicList).on('mousemove touchstart', throttle(displayControl, 99, true));
+                    displayControl(e, true);
+                    $switchPrev.off('click').on('click', switchGo);
+                    $switchNext.off('click').on('click', switchGo);
                     return false;
                 });
 
@@ -36,7 +41,7 @@
                     clearTimeout(clickTimer);
                     clickTimer = setTimeout(function() {
                         $.fn.mtfpicviewer.raw(opt.selector, opt.attrSelector);
-                    }, 250);
+                    }, 99);
                 }
 
                 function onMoveStartPicViewer(e) {
@@ -55,13 +60,12 @@
                             })
                             start.e.pos = start.$img.position();
                         }
-                   
                         $picViewer.on('mousemove touchmove', throttle(function(e) {
                             movedDistance = onMovingPicViewer(e, start);
                         }, 36));
                         $(window).on('mouseup touchend', function() {
                             onMoveEndWindow(start, movedDistance)
-                        }); 
+                        });
                 }
 
                 function onMovingPicViewer(e, start) {
@@ -122,6 +126,31 @@
                     var $img = $(this).children('img');
                         scaleImg($img, $img.data('scale') === 2 ? 1 : 2, e);
                         clearTimeout(clickTimer);
+                }
+
+                function displayControl(e, isFirst) {
+                    var ar = [$dotIndicator], x = e.clientX, windowWidth = $(window).width(),
+                        len = $picList.children().length, index = $picList.children('.current').index();
+                    if (!('ontouchstart' in window)) {
+                        $switchPrev.hide();
+                        $switchNext.hide();
+                        if (x < windowWidth / 3 || isFirst) {
+                            index !== 0 && ar.push($switchPrev);
+                        }
+                        if (x > windowWidth / 3 * 2  || isFirst) {
+                            index < len - 1 && ar.push($switchNext);
+                        }
+                    } 
+                    $.each(ar, function(index, ele) {
+                        ele.stop(true, true).fadeIn().delay(3500).fadeOut();
+                    });
+                }
+
+                function switchGo() {
+                    var index = $picList.children('.current').index();
+                    this.className.indexOf('prev') > -1 ? index-- : index++;
+                    $.fn.mtfpicviewer.go(index);
+                    return false;
                 }
         }
     });
@@ -217,6 +246,8 @@
         $dotIndicator.children('div').eq(index).addClass('current').siblings().removeClass('current');
         if (index !== currentIndex) {
             scaleImg($current.children('img'), 1);
+            index === 0 && $switchPrev.hide();
+            index === len - 1 && $switchNext.hide();
         }
     }
     
@@ -284,19 +315,22 @@
     }
 
     /**
-     * 节流
+     * 节流或防抖
      * @param {Function} fn 要节流的函数 
      * @param {Integer} wait 多少毫秒执行一次
+     * @param {Boolean} debounce 是否开启防抖
      */
-    function throttle(fn, wait) {
+    function throttle(fn, wait, debounce) {
         var timer = null
         return function() {
             var _this = this, args = arguments;
+            debounce && timer &&  (clearTimeout(timer) || (timer = null))
             !timer && (timer = setTimeout(function() {
                 fn.apply(_this, args);
                 timer = null;
             }, wait));
         }
     }
+
     $('body').append($picViewerBg).append($picViewer);
 })(jQuery);
