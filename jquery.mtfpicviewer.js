@@ -80,19 +80,18 @@
                                         $img.css('top', Math.max(imgPosTop - yDistance * scale, start.imgMinTop) + 'px');
                                     }
                                     if (xDistance < 0 && imgPosLeft < 0) {
-                                        $img.css('left', Math.min(imgPosLeft - xDistance * scale * 2, 0) + 'px');
+                                        $img.css('left', Math.min(imgPosLeft - xDistance * scale, 0) + 'px');
                                     } else if (xDistance > 0 && imgPosLeft > start.imgMinLeft + 1) {
-                                        $img.css('left', Math.max(imgPosLeft - xDistance * scale * 2, start.imgMinLeft) + 'px');
+                                        $img.css('left', Math.max(imgPosLeft - xDistance * scale, start.imgMinLeft) + 'px');
                                     } else {
                                         isMoving = false;
                                     }
                                 } else {  
                                     isMoving = false;
                                 }
-                                if (isMoving) {
-                                    start.x = x;
-                                    start.y = y;
-                                } else {
+                                start.x = x;
+                                start.y = y;
+                                if (isMoving === false) {
                                     $picList.css('marginLeft', parseFloat($picList.css('marginLeft')) - xDistance + 'px');
                                 }
                             }
