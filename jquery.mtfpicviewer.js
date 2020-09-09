@@ -28,6 +28,7 @@
                         imgUrls.push($(ele).attr(attrSelector));
                     });
                     $.fn.mtfpicviewer.zoome($current.attr(attrSelector), imgUrls);
+                    return false;
                 });
 
                 var clickTimer = null;
