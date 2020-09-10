@@ -153,10 +153,9 @@
                  */
                 function displayControl(e, ignoreX) {
                     var ar = [$dotIndicator], x = e.clientX, picViewerOffsetLeft = $picViewer.offset().left, picViewerWidth_3 = $picViewer.width() / 3,
-                        len = $picList.children().length, index = $picList.children('.current').index();
-                    if (!('ontouchstart' in window)) {
-                        $switchPrev.hide();
-                        $switchNext.hide();
+                        len = $picList.children().length, index = $picList.children('.current').index(),
+                        isTouch = 'ontouchstart' in window;
+                    if (!isTouch) {
                         if (ignoreX || x < picViewerOffsetLeft + picViewerWidth_3) {
                             index !== 0 && ar.push($switchPrev);
                         }
@@ -164,8 +163,18 @@
                             index < len - 1 && ar.push($switchNext);
                         }
                     } 
-                    $.each(ar, function(index, ele) {
-                        ele.stop(true, true).fadeIn(ele.css('display') === 'none' ? 500 : 0).delay(3500).fadeOut();
+                    $.each(ar, function(index, $ele) {
+                        (ignoreX || $ele.css('display') === 'none') && $ele.stop(true, true).fadeIn().delay(3500).fadeOut()
+                        .off('mouseenter touchend').on('mouseenter touchend', function() {
+                            $(this).stop(true, true).show();
+                            $ele.timer && clearTimeout($ele.timer);
+                            isTouch && ($ele.timer = setTimeout(function() {
+                                $ele.fadeOut();
+                            }, 3500));
+                        })
+                        .off('mouseleave').on('mouseleave', function() {
+                            $(this).stop(true, true).delay(200).fadeOut();
+                        })
                     });
                 }
                 /**
