@@ -341,7 +341,7 @@
         } else {
             if (addon === true) {
                 rate *= scale;
-                rate = rate < 0.5 && 0.5 || rate > 5 && 5 || rate;
+                rate = rate < 0.5 && 0.5 || rate > 3 && 3 || rate;
             }
             var topDiffer = $(window).height() - $img.height() * rate,
                 leftDiffer = $picViewer.width() - $img.width() * rate,
