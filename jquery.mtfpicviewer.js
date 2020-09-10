@@ -152,20 +152,20 @@
                  * @param {Boolean} ignoreX 忽略鼠标指针或触摸点的X坐标，尝试显示切换按钮
                  */
                 function displayControl(e, ignoreX) {
-                    var ar = [$dotIndicator], x = e.clientX, windowWidth_3 = $(window).width() / 3,
+                    var ar = [$dotIndicator], x = e.clientX, picViewerOffsetLeft = $picViewer.offset().left, picViewerWidth_3 = $picViewer.width() / 3,
                         len = $picList.children().length, index = $picList.children('.current').index();
                     if (!('ontouchstart' in window)) {
                         $switchPrev.hide();
                         $switchNext.hide();
-                        if (ignoreX || x < windowWidth_3) {
+                        if (ignoreX || x < picViewerOffsetLeft + picViewerWidth_3) {
                             index !== 0 && ar.push($switchPrev);
                         }
-                        if (ignoreX || x > windowWidth_3 * 2) {
+                        if (ignoreX || x > picViewerOffsetLeft + picViewerWidth_3 * 2) {
                             index < len - 1 && ar.push($switchNext);
                         }
                     } 
                     $.each(ar, function(index, ele) {
-                        ele.stop(true, true).fadeIn().delay(3500).fadeOut();
+                        ele.stop(true, true).fadeIn(ele.css('display') === 'none' ? 500 : 0).delay(3500).fadeOut();
                     });
                 }
                 /**
