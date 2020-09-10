@@ -1,5 +1,13 @@
 
-/* jquery.mtfpicviewer.css */
+/*!
+ * jQuery Plugin：jquery.mtfpicviewer.css 1.0.0
+ * https://github.com/mantoufan/mtfPicViewer
+ *
+ * Copyright 2020, 吴小宇 Shon Ng
+ * https://github.com/mantoufan
+ * 
+ * Date: 2020-09-10T16:07Z
+ */
 .mtf-pic-viewer, .mtf-pic-viewer-bg {
     position: fixed;
     top: 0;
@@ -14,6 +22,7 @@
     width: 100%;
     pointer-events: none;
 }
+/* 图片列表 */
 .mtf-pic-list {
     position: relative;
     top: 50%;
@@ -38,6 +47,7 @@
     user-select: none;
     object-fit: contain;
 }
+/* 切换按钮：小圆点 */
 .mtf-dot-indicator {
     position: absolute;
     bottom: 10%;
@@ -70,12 +80,14 @@
 .mtf-dot-indicator div:hover::before {
     background-color: rgba(255, 255, 255, .75);
 }
+/* 调试框 */
 .mtf-debug {
     position: fixed;
     color: #fff;
     z-index: 9;
     top: 5px;
 }
+/* 切换按钮：上下张（仅鼠标控制设备可见） */
 .mtf-pic-switch {
     position: absolute;
     display: none;

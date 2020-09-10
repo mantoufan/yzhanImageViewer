@@ -1,3 +1,12 @@
+/*!
+ * jQuery Plugin：jquery.mtfpicviewer.js 1.0.0
+ * https://github.com/mantoufan/mtfPicViewer
+ *
+ * Copyright 2020, 吴小宇 Shon Ng
+ * https://github.com/mantoufan
+ * 
+ * Date: 2020-09-10T15:39Z
+ */
 (function ($) {
     var $picViewer = $('<div>').addClass('mtf-pic-viewer'),
         $picViewerBg = $('<div>').addClass('mtf-pic-viewer-bg'),
