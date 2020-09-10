@@ -24,6 +24,9 @@
                     attrSelector: opt.attrSelector || 'src',
                     parentSelector: opt.parentSelector,
                     className: opt.className,
+                    onChange: opt.onChange,
+                    onOpen: opt.onOpen,
+                    onClose: opt.onClose,
                     debug : opt.debug || false
                 }, clickTimer = null;
 
@@ -37,13 +40,14 @@
                     });
                     $picViewer.attr('class' , 'mtf-pic-viewer' + (opt.className && ' ' + opt.className || ''));
                     opt.debug ? $debug.show() : $debug.hide();
-                    $.fn.mtfpicviewer.zoome($current.attr(opt.attrSelector), imgUrls);
+                    $.fn.mtfpicviewer.open($current.attr(opt.attrSelector), imgUrls, opt.onOpen);
                     $picViewer.off('click').on('click', onClickPicViewer);
                     $picViewer.off('mousedown touchstart mousemove').on('mousedown touchstart', onMoveStartPicViewer);
                     $picList.off('dblclick mousemove touchend').on('mousemove touchend', throttle(displayControl, 99, true)).on('dblclick', 'div', onDblclickPicList);
                     displayControl(e, true);
                     $switchPrev.off('click').on('click', switchGo);
                     $switchNext.off('click').on('click', switchGo);
+                    $dotIndicator.off('click').on('click', 'div', onClickDotIndicator);
                     return false;
                 });
 
@@ -53,7 +57,7 @@
                 function onClickPicViewer() {
                     clearTimeout(clickTimer);
                     clickTimer = setTimeout(function() {
-                        $.fn.mtfpicviewer.raw(opt.selector, opt.attrSelector);
+                        $.fn.mtfpicviewer.close(opt.selector, opt.attrSelector, opt.onClose);
                     }, 199);
                 }
 
@@ -142,7 +146,7 @@
                             }
                         }, 36);
                     }
-                    $.fn.mtfpicviewer.go(index);
+                    $.fn.mtfpicviewer.go(index, opt.onChange);
                     $picViewer.off('mousemove touchmove');
                     $(window).off('mouseup touchend');
                 }
@@ -192,18 +196,28 @@
                 function switchGo() {
                     var index = $picList.children('.current').index();
                     this.className.indexOf('prev') > -1 ? index-- : index++;
-                    $.fn.mtfpicviewer.go(index);
+                    $.fn.mtfpicviewer.go(index, opt.onChange);
+                    return false;
+                }
+
+                /**
+                 * 当小圆点被点击时
+                 */
+                function onClickDotIndicator() {
+                    var index = $(this).index();
+                    $.fn.mtfpicviewer.go(index, opt.onChange);
                     return false;
                 }
         }
     });
     
     /**
-     * 放大：zoome
+     * 打开：open
      * @param {String} currentImgUrl 当前图片地址
      * @param {Array} imgUrls 所有图片地址数组
+     * @param {Function} onOpen 当picViewer被打开时触发
      */
-    $.fn.mtfpicviewer.zoome = function (currentImgUrl, imgUrls) {
+    $.fn.mtfpicviewer.open = function (currentImgUrl, imgUrls, onOpen) {
         var currentIndex = 0, currentClass, $target = $(window.event.target), imgsLen = imgUrls.length;
         preventRollThrough(true);
         $picList.empty();
@@ -216,14 +230,11 @@
                 currentClass = '';
             }
             $('<div>').append($('<img>').attr('src', imgUrl).mousedown(function(e){e.preventDefault()})).appendTo($picList).addClass(currentClass);
-            imgsLen > 1 && $('<div>').appendTo($dotIndicator).addClass(currentClass).click(function() {
-                $.fn.mtfpicviewer.go(index);
-                return false;
-            });
+            imgsLen > 1 && $('<div>').appendTo($dotIndicator).addClass(currentClass);
         })
         $picList.css('marginLeft', - currentIndex * 100 + '%');
         // 从触发事件的图片开始放大
-        if ($target.length === 1 && $target[0].tagName === 'IMG') {
+        if ($target.length === 1) {
             var scrollTop = $(window).scrollTop(), top = $target.offset().top - scrollTop, 
                 left = $target.offset().left, width = parseInt($picViewer.css('maxWidth')) || $(window).width();
             $picViewer.show().css({
@@ -248,14 +259,16 @@
                 })
             })
             $picViewerBg.show();
+            onOpen && onOpen($picList.children('.current').index());
         }
     }
     /**
-     * 还原：raw
+     * 关闭：close
      * @param {String} [selector=img] 放大自某类元素的选择器
      * @param {String} [attrSelector=src] 放大图片地址来自元素的属性名
+     * @param {Function} onClose 当picViewer被关闭时触发
      */
-    $.fn.mtfpicviewer.raw = function (selector, attrSelector) {
+    $.fn.mtfpicviewer.close = function (selector, attrSelector, onClose) {
         var $target = $((selector || 'img') + '[' + (attrSelector || 'src') + '="' + $picList.children('.current').children('img').attr('src') + '"]');
         if ($target.length > 1) {
             preventRollThrough(false);
@@ -274,14 +287,16 @@
                     $picViewer.hide();
                     $picViewerBg.hide();
                 });
+                onClose && onClose($picList.children('.current').index());
         }
     }
 
     /**
      * 切换：go
      * @param {Integer} index 当前图片地址
+     * @param {Function} onChange 当图片切换时回调函数
      */
-    $.fn.mtfpicviewer.go = function (index) {
+    $.fn.mtfpicviewer.go = function (index, onChange) {
         var $current = $picList.children('.current'), currentIndex = $current.index(), len = $picList.children().length;
         index = Math.max(0, Math.min(index, len - 1));
         $picList.stop(true, true).animate({'marginLeft': - index * 100 + '%'}, 300);
@@ -291,6 +306,7 @@
             scaleImg($current.children('img'), 1);
             index === 0 && $switchPrev.hide();
             index === len - 1 && $switchNext.hide();
+            onChange && onChange($picList.children('.current').index(), $current.index());
         }
     }
     

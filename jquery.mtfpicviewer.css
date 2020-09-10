@@ -17,6 +17,7 @@
 .mtf-pic-viewer {
     background-color: #000;
     overflow: hidden;
+    transition: background-color .5s linear;
 }
 .mtf-pic-viewer-bg {
     width: 100%;
