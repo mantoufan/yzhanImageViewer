@@ -20,11 +20,11 @@
     $.fn.extend({
         "mtfpicviewer": function (opt) {
             var opt = {
-                    debug : opt.debug || false,
-                    maxWidth: opt.maxWidth,
                     selector: opt.selector || 'img',
                     attrSelector: opt.attrSelector || 'src',
-                    parentSelector: opt.parentSelector
+                    parentSelector: opt.parentSelector,
+                    className: opt.className,
+                    debug : opt.debug || false
                 }, clickTimer = null;
 
                 this.off('click').on('click', opt.selector, function(e) {
@@ -35,7 +35,7 @@
                     $parent.find(opt.selector).each(function(index, ele) {
                         imgUrls.push($(ele).attr(opt.attrSelector));
                     });
-                    opt.maxWidth && $picViewer.css('maxWidth', opt.maxWidth);
+                    $picViewer.attr('class' , 'mtf-pic-viewer' + (opt.className && ' ' + opt.className || ''));
                     opt.debug ? $debug.show() : $debug.hide();
                     $.fn.mtfpicviewer.zoome($current.attr(opt.attrSelector), imgUrls);
                     $picViewer.off('click').on('click', onClickPicViewer);
