@@ -45,11 +45,34 @@
                     $picViewer.off('mousedown touchstart mousemove').on('mousedown touchstart', onMoveStartPicViewer);
                     $picList.off('dblclick mousemove touchend').on('mousemove touchend', throttle(displayControl, 99, true)).on('dblclick', 'div', onDblclickPicList);
                     displayControl(e, true);
-                    $switchPrev.off('click').on('click', switchGo);
-                    $switchNext.off('click').on('click', switchGo);
+                    $switchPrev.off('click').on('click', function(){return switchGo('prev')});
+                    $switchNext.off('click').on('click', function(){return switchGo('next')});
                     $dotIndicator.off('click').on('click', 'div', onClickDotIndicator);
+                    $(window).on('keydown', onKeydownWindow);
                     return false;
                 });
+
+                /**
+                 * 当按键时
+                 */
+                function onKeydownWindow(e) {
+                    switch (e.keyCode) {
+                        case 37: // ←键 上一张
+                            switchGo('prev');
+                            break;
+                        case 39: // →键 下一张
+                            switchGo('next');
+                            break;
+                        case 82: // R键 还原图片比例到100%
+                            scaleImg($picList.children('.current').children('img'), 1);
+                            break;
+                        case 27: // ESC键 退出PicViewer
+                            onClickPicViewer.call(this);
+                            break;
+                        default:
+                            break;
+                    }
+                }
 
                 /**
                  * 当PicViewer被点击时
@@ -58,6 +81,7 @@
                     clearTimeout(clickTimer);
                     clickTimer = setTimeout(function() {
                         $.fn.mtfpicviewer.close(opt.selector, opt.attrSelector, opt.onClose);
+                        $(window).off('keydown', onKeydownWindow);
                     }, 199);
                 }
 
@@ -191,13 +215,13 @@
                     });
                 }
                 /**
-                 * 上下张切换：仅鼠标控制设备显示，触屏不显示
+                 * 上下张切换：仅鼠标控制设备显示切换按钮，触屏不显示
                  */
-                function switchGo() {
+                function switchGo(type) {
                     var index = $picList.children('.current').index();
-                    this.className.indexOf('prev') > -1 ? index-- : index++;
-                    $.fn.mtfpicviewer.go(index, opt.onChange);
-                    return false;
+                        type === 'prev' ? index-- : index++;
+                        $.fn.mtfpicviewer.go(index, opt.onChange);
+                        return false;
                 }
 
                 /**
