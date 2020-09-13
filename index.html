@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mtfPicViewer Showcase</title>
+    <style>
+        body {
+            background-color: #f7f7f7;
+        }
+        .main {
+            width: calc(100% - 10pt);
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 5pt 10pt;
+            background-color: #fff;
+        }
+        .main img {
+            width: 100%;
+            margin: 5pt 0;
+            cursor: pointer;
+        }
+        .main img:hover {
+            box-shadow: 5pt 5pt #f7f7f7;
+        }
+        .main p {
+            margin: 5pt 0;
+            font: 25pt fangsong;
+            text-align: center;
+        }
+        .pic-viewer {
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <div>
+            <p>第一组</p>
+            <img src="https://i.loli.net/2020/09/13/EJqR8UXHtypLhTa.jpg" alt="图片1">
+            <img src="https://i.loli.net/2020/09/13/Yu8nSZ24kdiFEcq.jpg" alt="图片2">
+            <img src="https://i.loli.net/2020/09/13/KRdbZjT4lwNYqyL.jpg" alt="图片3">
+        </div>
+        <div>
+            <p>第二组</p>
+            <img src="https://i.loli.net/2020/09/13/6jwICcgpiArnWm3.jpg" alt="图片4">
+            <img src="https://i.loli.net/2020/09/13/SiALDCtuHKN83W9.jpg" alt="图片5">
+            <img src="https://i.loli.net/2020/09/13/pAWFEPrNhSuzfOQ.jpg" alt="图片6">
+        </div>
+        <div>
+            <p>第三组</p>
+            <img src="https://i.loli.net/2020/09/13/2E49rfvAMxJtuqy.jpg" alt="图片7">
+            <img src="https://i.loli.net/2020/09/13/kTG4F65JyiKwQAh.jpg" alt="图片8">
+            <img src="https://i.loli.net/2020/09/13/ILkGbRfOKY9w3gy.jpg" alt="图片9">
+            <img src="https://i.loli.net/2020/09/13/M8P4uUwoqsed9Ag.jpg" alt="图片10">
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/combine/npm/jquery@1.12.4,npm/hammer-touchemulator@0.0.2,npm/rgbaster@1.0.0"></script>
+    <script src="./jquery.mtfpicviewer.js"></script>
+    <script>
+        /**
+         * 使用图片的主要颜色值设置mtfPicViewer背景色
+         * @param {Integer} curIndex 当前mtfPicViewer中图片的索引值
+         */
+        function setBgWithDominantColor(curIndex) {
+            var img = $('.mtf-pic-list').children().eq(curIndex).children('img')[0];
+            $('.mtf-pic-viewer').css('backgroundColor', '#000');
+            if (img.src.indexOf('file://') === -1) {
+                RGBaster.colors(img, {
+                    paletteSize: 1,
+                    success: function(payload) {
+                        $('.mtf-pic-viewer').css('backgroundColor', payload.dominant);
+                    }
+                });
+            }
+        }
+        $('.main').mtfpicviewer({
+            selector: 'img',
+            attrSelector: 'src',
+            parentSelector: 'div',
+            className: 'pic-viewer',
+            debug: false,
+            onChange: function(curIndex, preIndex) {
+                // console.log(curIndex, preIndex); 获取当前对象的索引值 获取跳转前上一个对象的索引值
+                setBgWithDominantColor(curIndex);
+            },
+                onOpen: function(curIndex) {
+                setBgWithDominantColor(curIndex);
+            },
+            onClose: function(curIndex) {
+                var $img = $('.mtf-pic-list').children().eq(curIndex).children('img');
+                $('html,body').animate({'scrollTop': $('img[src="' + $img.attr('src') + '"]').offset().top});
+            }
+        });
+        location.search.indexOf('touch=on') > -1 && TouchEmulator();
+    </script>
+</body>
+</html>
