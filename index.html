@@ -68,6 +68,7 @@
             if (img.src.indexOf('file://') === -1) {
                 RGBaster.colors(img, {
                     paletteSize: 1,
+                    exclude: ['rgb(0, 0, 0)'],
                     success: function(payload) {
                         $('.mtf-pic-viewer').css('backgroundColor', payload.dominant);
                     }
