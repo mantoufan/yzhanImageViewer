@@ -65,7 +65,6 @@
          */
         function setBgWithDominantColor(curIndex) {
             var img = $('.mtf-pic-list').children().eq(curIndex).children('img')[0];
-            $('.mtf-pic-viewer').css('backgroundColor', '#000');
             if (img.src.indexOf('file://') === -1) {
                 RGBaster.colors(img, {
                     paletteSize: 1,
