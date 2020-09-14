@@ -20,18 +20,18 @@ https://mantoufan.github.io/mtfPicViewer/?touch=on
 `返回` 单击 / ESC键
 ## 安装
 1. 本插件依赖jQuery，请先引入jQuery
-```
-<script type='text/javascript' src="https://cdn.jsdelivr.net/combine/npm/jquery@1.12.4"></script>
-```
+    ```
+    <script type='text/javascript' src="https://cdn.jsdelivr.net/combine/npm/jquery@1.12.4"></script>
+    ```
 2. 再引入本插件
 - CDN
-```
-<script type='text/javascript' src="https://cdn.dm126.com/all/m/mtf/mtfPicViewer/1.0.0/mtfPicViewer.js"></script>
-```
+    ```
+    <script type='text/javascript' src="https://cdn.dm126.com/all/m/mtf/mtfPicViewer/dist/1.0.0/mtfPicViewer.js"></script>
+    ```
 - 下载到本地
 https://github.com/mantoufan/mtfPicViewer/releases
 ## 配置
-### 可选项
+### 选项
 ```
 $(areaSelector).mtfpicviewer({
     selector: 'img',
@@ -46,7 +46,7 @@ $(areaSelector).mtfpicviewer({
 ```
 - `areaSelector` {jQuery选择器} 区域选择器
     - 后面的所有设置都会应用在这个区域内的图片 / 视频上
-    - 同一页面，不同区域，设置相同，可在选择器一次选中这些区域，`,`分隔亦可
+    - 同一页面，不同区域，设置相同，可在选择器一次选中这些区域，英文半角逗号`,`分隔也可
     - 同一页面，不同区域，设置不同，可声明多个jQuery选择器.mtfpicviewer(options)
 - `selector` {jQuery选择器} 元素选择器
     - 元素可以是图片（未来包括视频），也可以是包含图片地址属性的元素（懒加载场景）
@@ -95,38 +95,39 @@ $(areaSelector).mtfpicviewer({
 https://github.com/briangonzalez/rgbaster.js  
 一款优秀的识别图片主题色的JS插件  
 通过rgbaster.js，在点击放大图片`onOpen`和图片切换`onChange`时，更新背景色
-```
-/**
- * 使用图片的主要颜色值设置背景色
- * @param {Integer} curIndex 当前图片的索引值
-*/
-function setBgWithDominantColor(curIndex) {
-    var img = $('.mtf-pic-list').children().eq(curIndex).children('img')[0];
-    if (img.src.indexOf('file://') === -1) {
-        RGBaster.colors(img, {
-            paletteSize: 1,
-            success: function(payload) {
-                $('.mtf-pic-viewer').css('backgroundColor', payload.palette[0]);
-            }
-        });
+    ```
+    /**
+    * 使用图片的主要颜色值设置背景色
+    * @param {Integer} curIndex 当前图片的索引值
+    */
+    function setBgWithDominantColor(curIndex) {
+        var img = $('.mtf-pic-list').children().eq(curIndex).children('img')[0];
+        if (img.src.indexOf('file://') === -1) {
+            RGBaster.colors(img, {
+                paletteSize: 1,
+                success: function(payload) {
+                    $('.mtf-pic-viewer').css('backgroundColor', payload.palette[0]);
+                }
+            });
+        }
     }
-}
-$('.main').mtfpicviewer({
-    selector: 'img',
-    attrSelector: 'src',
-    parentSelector: 'div',
-    className: 'pic-viewer',
-    debug: false,
-    onChange: function(curIndex, preIndex) {
-        setBgWithDominantColor(curIndex);
-    },
-    onOpen: function(curIndex) {
-        setBgWithDominantColor(curIndex);
-    }
-});
-```
+    $('.main').mtfpicviewer({
+        selector: 'img',
+        attrSelector: 'src',
+        parentSelector: 'div',
+        className: 'pic-viewer',
+        debug: false,
+        onChange: function(curIndex, preIndex) {
+            setBgWithDominantColor(curIndex);
+        },
+        onOpen: function(curIndex) {
+            setBgWithDominantColor(curIndex);
+        }
+    });
+    ```
 完整代码您可以参考我们的演示DEMO源码。
-- shopXO 图片查看器 插件  
-![](https://i.loli.net/2020/09/14/LOPMylJafqYAr1v.jpg)
+- shopXO 图片查看器 插件
+
+![shopXO 图片查看器 插件介绍](https://i.loli.net/2020/09/14/LOPMylJafqYAr1v.jpg)
 ## 待办事项
 - 支持视频
