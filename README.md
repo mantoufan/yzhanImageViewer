@@ -26,7 +26,8 @@ https://mantoufan.github.io/mtfPicViewer/?touch=on
 2. 再引入本插件
 - CDN
     ```
-    <script type='text/javascript' src="https://cdn.dm126.com/all/m/mtf/mtfPicViewer/dist/1.0.0/mtfPicViewer.js"></script>
+    <link rel="stylesheet" href="https://cdn.dm126.com/all/m/mtf/mtfPicViewer/dist/1.0.0/jquery.mtfpicviewer.css">
+    <script type='text/javascript' src="https://cdn.dm126.com/all/m/mtf/mtfPicViewer/dist/1.0.0/jquery.mtfpicviewer.js"></script>
     ```
 - 下载到本地
 https://github.com/mantoufan/mtfPicViewer/releases
