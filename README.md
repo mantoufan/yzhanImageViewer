@@ -94,7 +94,12 @@ $(areaSelector).mtfpicviewer({
 - rgbaster.js  
 https://github.com/briangonzalez/rgbaster.js  
 一款优秀的识别图片主题色的JS插件  
-通过rgbaster.js，在点击放大图片`onOpen`和图片切换`onChange`时，更新背景色
+引入rgbaster.js 1.0.0
+    ```
+    <script type='text/javascript' src="https://cdn.jsdelivr.net/combine/npm/rgbaster@1.0.0"></script>
+    ```
+    通过rgbaster.js，在点击放大图片`onOpen`和图片切换`onChange`时，更新背景色
+
     ```
     /**
     * 使用图片的主要颜色值设置背景色
@@ -125,7 +130,7 @@ https://github.com/briangonzalez/rgbaster.js
         }
     });
     ```
-完整代码您可以参考我们的演示DEMO源码。
+    完整代码您可以参考我们的演示DEMO源码。
 - shopXO 图片查看器 插件
 
 ![shopXO 图片查看器 插件介绍](https://i.loli.net/2020/09/14/LOPMylJafqYAr1v.jpg)
