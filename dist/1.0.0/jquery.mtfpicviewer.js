@@ -31,16 +31,20 @@
                 }, clickTimer = null;
 
                 this.off('click').on('click', opt.selector, function(e) {
-                    var $current = $(this), $parent = $(e.delegateTarget), imgUrls = [];
+                    var $current = $(this), $parent = $(e.delegateTarget), urls = [];
                     if (opt.parentSelector) {
                         $parent = $current.parents(opt.parentSelector);
                     }
                     $parent.find(opt.selector).each(function(index, ele) {
-                        imgUrls.push($(ele).attr(opt.attrSelector));
+                        urls.push($(ele).attr(opt.attrSelector));
                     });
                     $picViewer.attr('class' , 'mtf-pic-viewer' + (opt.className && ' ' + opt.className || ''));
                     opt.debug ? $debug.show() : $debug.hide();
-                    $.fn.mtfpicviewer.open($current.attr(opt.attrSelector), imgUrls, opt.onOpen);
+                    $.fn.mtfpicviewer.open({
+                        attrSelector : $current.attr(opt.attrSelector),
+                        urls: urls,
+                        onOpen: opt.onOpen
+                    });
                     $picViewer.off('click').on('click', onClickPicViewer);
                     $picViewer.off('mousedown touchstart mousemove').on('mousedown touchstart', onMoveStartPicViewer);
                     $picList.off('dblclick mousemove touchend').on('mousemove touchend', throttle(displayControl, 99, true)).on('dblclick', 'div', onDblclickPicList);
@@ -63,7 +67,7 @@
                         case 39: // →键 下一张
                             switchGo('next');
                             break;
-                        case 82: // R键 还原图片比例到100%
+                        case 82: // R键 还原影像比例到100%
                             scaleImg($picList.children('.current').children('img'), 1);
                             break;
                         case 27: // ESC键 退出PicViewer
@@ -80,7 +84,10 @@
                 function onClickPicViewer() {
                     clearTimeout(clickTimer);
                     clickTimer = setTimeout(function() {
-                        $.fn.mtfpicviewer.close(opt.selector, opt.attrSelector, opt.onClose);
+                        $.fn.mtfpicviewer.close({
+                            selector: (opt.selector || '') + (opt.attrSelector ? ('[' + opt.attrSelector + '="' + $picList.children('.current').children('img').attr('src') + '"]') : ''),
+                            onClose: opt.onClose
+                        });
                         $(window).off('keydown', onKeydownWindow);
                     }, 199);
                 }
@@ -170,7 +177,10 @@
                             }
                         }, 36);
                     }
-                    $.fn.mtfpicviewer.go(index, opt.onChange);
+                    $.fn.mtfpicviewer.change({
+                        index: index,
+                        onChange: opt.onChange
+                    });
                     $picViewer.off('mousemove touchmove');
                     $(window).off('mouseup touchend');
                 }
@@ -220,7 +230,10 @@
                 function switchGo(type) {
                     var index = $picList.children('.current').index();
                         type === 'prev' ? index-- : index++;
-                        $.fn.mtfpicviewer.go(index, opt.onChange);
+                        $.fn.mtfpicviewer.change({
+                            index: index,
+                            onChange: opt.onChange
+                        });
                         return false;
                 }
 
@@ -229,7 +242,10 @@
                  */
                 function onClickDotIndicator() {
                     var index = $(this).index();
-                    $.fn.mtfpicviewer.go(index, opt.onChange);
+                    $.fn.mtfpicviewer.change({
+                        index: index,
+                        onChange: opt.onChange
+                    });
                     return false;
                 }
         }
@@ -237,101 +253,109 @@
     
     /**
      * 打开：open
-     * @param {String} currentImgUrl 当前图片地址
-     * @param {Array} imgUrls 所有图片地址数组
-     * @param {Function} onOpen 当picViewer被打开时触发
+     * @param {String} currentUrl 当前地址
+     * @param {Array} [urls] 所有地址数组
+     * @param {Function} [onOpen] 当picViewer被打开时触发
      */
-    $.fn.mtfpicviewer.open = function (currentImgUrl, imgUrls, onOpen) {
-        var currentIndex = 0, currentClass, $target = $(window.event.target), imgsLen = imgUrls.length;
-        preventRollThrough(true);
-        $picList.empty();
-        $dotIndicator.empty();
-        $.each(imgUrls, function(index, imgUrl) {
-            if (currentImgUrl === imgUrl) {
-                currentIndex = index;
-                currentClass = 'current';
-            } else {
-                currentClass = '';
-            }
-            $('<div>').append($('<img>').attr('src', imgUrl).mousedown(function(e){e.preventDefault()})).appendTo($picList).addClass(currentClass);
-            imgsLen > 1 && $('<div>').appendTo($dotIndicator).addClass(currentClass);
-        })
-        $picList.css('marginLeft', - currentIndex * 100 + '%');
-        // 从触发事件的图片开始放大
-        if ($target.length === 1) {
-            var scrollTop = $(window).scrollTop(), top = $target.offset().top - scrollTop, 
-                left = $target.offset().left, width = parseInt($picViewer.css('maxWidth')) || $(window).width();
-            $picViewer.show().css({
-                top: top,
-                left: left,
-                width: $target.width(),
-                height: $target.height(),
-                opacity: .5
-            }).animate({
-                top: 0,
-                left: ($(window).width() - width) / 2,
-                width: width,
-                height: $(window).height(),
-                opacity: 1
-            }, 500, function() {
-                $(this).css({
-                    right: 0,
-                    left: 0,
-                    margin: 'auto',
-                    width: '100%',
-                    height: '100%'
-                })
+    $.fn.mtfpicviewer.open = function (opt) {
+        var currentUrl = opt.currentUrl,
+            urls = opt.urls || [opt.currentUrl],
+            onOpen = opt.onOpen,
+            currentIndex = 0, currentClass, $target = $(window.event.target), imgsLen = urls.length;
+            preventRollThrough(true);
+            $picList.empty();
+            $dotIndicator.empty();
+            $.each(urls, function(index, Url) {
+                if (currentUrl === Url) {
+                    currentIndex = index;
+                    currentClass = 'current';
+                } else {
+                    currentClass = '';
+                }
+                $('<div>').append($('<img>').attr('src', Url).mousedown(function(e){e.preventDefault()})).appendTo($picList).addClass(currentClass);
+                imgsLen > 1 && $('<div>').appendTo($dotIndicator).addClass(currentClass);
             })
-            $picViewerBg.show();
-            onOpen && onOpen($picList.children('.current').index());
-        }
-    }
-    /**
-     * 关闭：close
-     * @param {String} [selector=img] 放大自某类元素的选择器
-     * @param {String} [attrSelector=src] 放大图片地址来自元素的属性名
-     * @param {Function} onClose 当picViewer被关闭时触发
-     */
-    $.fn.mtfpicviewer.close = function (selector, attrSelector, onClose) {
-        var $target = $((selector || 'img') + '[' + (attrSelector || 'src') + '="' + $picList.children('.current').children('img').attr('src') + '"]');
-        if ($target.length > 1) {
-            preventRollThrough(false);
-            var scrollTop = $(window).scrollTop(), top = $target.offset().top - scrollTop, left = $target.offset().left;
-                $picViewer.css({
-                    right: 'auto',
-                    left: $picViewer.offset().left,
-                    margin: 0
-                }).animate({
+            $picList.css('marginLeft', - currentIndex * 100 + '%');
+            // 从触发事件的影像开始放大
+            if ($target.length === 1) {
+                var scrollTop = $(window).scrollTop(), top = $target.offset().top - scrollTop, 
+                    left = $target.offset().left, width = parseInt($picViewer.css('maxWidth')) || $(window).width();
+                $picViewer.show().css({
                     top: top,
                     left: left,
                     width: $target.width(),
                     height: $target.height(),
-                    opacity: .5,
+                    opacity: .5
+                }).animate({
+                    top: 0,
+                    left: ($(window).width() - width) / 2,
+                    width: width,
+                    height: $(window).height(),
+                    opacity: 1
                 }, 500, function() {
-                    $picViewer.hide();
-                    $picViewerBg.hide();
-                });
-                onClose && onClose($picList.children('.current').index());
+                    $(this).css({
+                        right: 0,
+                        left: 0,
+                        margin: 'auto',
+                        width: '100%',
+                        height: '100%'
+                    })
+                })
+                $picViewerBg.show();
+                onOpen && onOpen($picList.children('.current').index());
+            }
+    }
+    /**
+     * 关闭：close
+     * @param {String} [selector=img] 元素的选择器，关闭时，查看器逐渐缩小到这个元素
+     * @param {Function} [onClose] 当picViewer被关闭时触发
+     */
+    $.fn.mtfpicviewer.close = function (opt) {
+        var selector = opt.selector || '',
+            onClose = opt.onClose,
+            $target = $(selector) || [];
+        if ($target.length > 1) {
+            var scrollTop = $(window).scrollTop(), top = $target.offset().top - scrollTop, left = $target.offset().left;
+            $picViewer.css({
+                right: 'auto',
+                left: $picViewer.offset().left,
+                margin: 0
+            }).animate({
+                top: top,
+                left: left,
+                width: $target.width(),
+                height: $target.height(),
+                opacity: .5,
+            }, 500, function() {
+                $picViewer.hide();
+            });
+        } else {
+            $picViewer.fadeOut();
         }
+        $picViewerBg.hide();
+        preventRollThrough(false);
+        onClose && onClose($picList.children('.current').index());
     }
 
     /**
-     * 切换：go
-     * @param {Integer} index 当前图片地址
-     * @param {Function} onChange 当图片切换时回调函数
+     * 切换：change
+     * @param {Integer} index 要跳转到第几张影像，从0开始
+     * @param {Function} [onChange] 当影像切换时回调函数
      */
-    $.fn.mtfpicviewer.go = function (index, onChange) {
-        var $current = $picList.children('.current'), currentIndex = $current.index(), len = $picList.children().length;
-        index = Math.max(0, Math.min(index, len - 1));
-        $picList.stop(true, true).animate({'marginLeft': - index * 100 + '%'}, 300);
-        $picList.children('div').eq(index).addClass('current').siblings().removeClass('current');
-        $dotIndicator.children('div').eq(index).addClass('current').siblings().removeClass('current');
-        if (index !== currentIndex) {
-            scaleImg($current.children('img'), 1);
-            index === 0 && $switchPrev.hide();
-            index === len - 1 && $switchNext.hide();
-            onChange && onChange($picList.children('.current').index(), $current.index());
-        }
+    $.fn.mtfpicviewer.change = function (opt) {
+        var index = opt.index,
+            onChange = opt.onChange,
+            $current = $picList.children('.current'), currentIndex = $current.index(), len = $picList.children().length;
+            index = Math.max(0, Math.min(index, len - 1));
+            $picList.stop(true, true).animate({'marginLeft': - index * 100 + '%'}, 300);
+            $picList.children('div').eq(index).addClass('current').siblings().removeClass('current');
+            $dotIndicator.children('div').eq(index).addClass('current').siblings().removeClass('current');
+            if (index !== currentIndex) {
+                scaleImg($current.children('img'), 1);
+                index === 0 && $switchPrev.hide();
+                index === len - 1 && $switchNext.hide();
+                onChange && onChange($picList.children('.current').index(), $current.index());
+            }
     }
     
     /**
@@ -362,8 +386,8 @@
     }
     
     /**
-     * 缩放图片
-     * @param {Jquey Object} $img 要设置的图片对象
+     * 缩放影像
+     * @param {Jquey Object} $img 要设置的影像对象
      * @param {Integer} rate 缩放比率
      * @param {c.Event} [e] Jquery封装后的事件对象
      * @param {Boolean} [addon] 是否开启叠加放缩方式，保留元素当前的缩放比例，在此基础上继续放缩
