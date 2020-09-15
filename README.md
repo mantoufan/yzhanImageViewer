@@ -7,13 +7,15 @@
 - PC
   - 鼠标及键盘控制：  
 https://mantoufan.github.io/mtfPicViewer/  
+http://mantoufan.gitee.io/mtfpicviewer/  
   - 鼠标模拟触屏：（Shift + 鼠标左键拖动模拟双指缩放）  
 https://mantoufan.github.io/mtfPicViewer/?touch=on  
+http://mantoufan.gitee.io/mtfpicviewer/?touch=on  
 ![电脑演示动画](https://i.loli.net/2020/09/15/QPnNHiR8tL93xXg.gif)
 - 移动版  
    请用手机浏览器打开上面的网址或扫码 
    - 演示   
-   ![演示页二维码](https://i.loli.net/2020/09/15/fCrw3TzAHIei8xM.png) 
+   ![演示页二维码](https://i.loli.net/2020/09/15/YWMKT9bqQ5Zmkud.png) 
    - 第三方商城  
    ![第三方商城二维码](https://i.loli.net/2020/09/15/OUFbRCvYumSlfsI.png)  
    ![移动演示动画](https://i.loli.net/2020/09/15/gStTeDxcAnL5FaH.gif)
