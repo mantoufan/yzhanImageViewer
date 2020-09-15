@@ -41,7 +41,7 @@
                     $picViewer.attr('class' , 'mtf-pic-viewer' + (opt.className && ' ' + opt.className || ''));
                     opt.debug ? $debug.show() : $debug.hide();
                     $.fn.mtfpicviewer.open({
-                        cuurentUrl: $current.attr(opt.attrSelector),
+                        currentUrl: $current.attr(opt.attrSelector),
                         urls: urls,
                         onOpen: opt.onOpen
                     });
