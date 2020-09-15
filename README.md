@@ -10,7 +10,9 @@ https://mantoufan.github.io/mtfPicViewer/
   - 鼠标模拟触屏：（Shift + 鼠标左键拖动模拟双指缩放）  
 https://mantoufan.github.io/mtfPicViewer/?touch=on
 - 移动版  
-   请用手机浏览器打开的网址即可
+   请用手机浏览器打开上面的网址或扫码
+   ![二维码](https://i.loli.net/2020/09/15/OUFbRCvYumSlfsI.png)
+
 ## 使用
 `全屏` 点击 图片 / 视频  
 `切换` 滑动 / 鼠标拖拽 / ←→键 / 小圆点 / 切换按钮  
