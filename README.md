@@ -8,14 +8,15 @@
   - 鼠标及键盘控制：  
 https://mantoufan.github.io/mtfPicViewer/  
   - 鼠标模拟触屏：（Shift + 鼠标左键拖动模拟双指缩放）  
-https://mantoufan.github.io/mtfPicViewer/?touch=on
+https://mantoufan.github.io/mtfPicViewer/?touch=on  
+![电脑演示动画](https://i.loli.net/2020/09/15/QPnNHiR8tL93xXg.gif)
 - 移动版  
    请用手机浏览器打开上面的网址或扫码 
-   - 演示页 
+   - 演示   
    ![演示页二维码](https://i.loli.net/2020/09/15/fCrw3TzAHIei8xM.png) 
    - 第三方商城  
-   ![第三方商城二维码](https://i.loli.net/2020/09/15/OUFbRCvYumSlfsI.png)
-
+   ![第三方商城二维码](https://i.loli.net/2020/09/15/OUFbRCvYumSlfsI.png)  
+   ![移动演示动画](https://i.loli.net/2020/09/15/gStTeDxcAnL5FaH.gif)
 ## 使用
 `全屏` 点击 图片 / 视频  
 `切换` 滑动 / 鼠标拖拽 / ←→键 / 小圆点 / 切换按钮  
