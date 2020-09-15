@@ -33,7 +33,7 @@
                 this.off('click').on('click', opt.selector, function(e) {
                     var $current = $(this), $parent = $(e.delegateTarget), urls = [];
                     if (opt.parentSelector) {
-                        $parent = $current.parents(opt.parentSelector);
+                        $parent = $current.parents(opt.parentSelector).eq(0);
                     }
                     $parent.find(opt.selector).each(function(index, ele) {
                         urls.push($(ele).attr(opt.attrSelector));
