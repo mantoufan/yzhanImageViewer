@@ -11,9 +11,9 @@ https://mantoufan.github.io/mtfPicViewer/
 https://mantoufan.github.io/mtfPicViewer/?touch=on
 - 移动版  
    请用手机浏览器打开上面的网址或扫码 
-   - 演示页
+   - 演示页 
    ![演示页二维码](https://i.loli.net/2020/09/15/fCrw3TzAHIei8xM.png) 
-   - 第三方商城 
+   - 第三方商城  
    ![第三方商城二维码](https://i.loli.net/2020/09/15/OUFbRCvYumSlfsI.png)
 
 ## 使用
