@@ -24,7 +24,10 @@
                     attrSelector: opt.attrSelector || 'src',
                     parentSelector: opt.parentSelector,
                     className: opt.className,
-                    reverseDrag: $.extend({x: false, y: false}, opt.reverseDrag),
+                    controls: $.extend({
+                        reverseDrag: {x: false, y: false},
+                        canChange: true
+                    }, opt.controls),
                     onChange: opt.onChange,
                     onOpen: opt.onOpen,
                     onClose: opt.onClose,
@@ -43,7 +46,7 @@
                     opt.debug ? $debug.show() : $debug.hide();
                     $.fn.mtfpicviewer.open({
                         currentUrl: $current.attr(opt.attrSelector),
-                        urls: urls,
+                        urls: opt.controls.canChange ? urls : [$current.attr(opt.attrSelector)],
                         onOpen: opt.onOpen
                     });
                     $picViewer.off('click').on('click', onClickPicViewer);
@@ -133,7 +136,7 @@
                     } else {
                         var imgPosLeft = $img.position().left, imgPosTop = $img.position().top,
                             x = getXY(e, 'x'), y = getXY(e, 'y'), scale = $img.data('scale') || 1, isMoving = true;
-                            xDistance = reverseDrag['x'] ? start.x - x : x - start.x, yDistance =  reverseDrag['x'] ? start.y - y : y - start.y;
+                            xDistance = opt.controls.reverseDrag['x'] ? start.x - x : x - start.x, yDistance =  opt.controls.reverseDrag['x'] ? start.y - y : y - start.y;
                             if (xDistance || yDistance) {
                                 if (scale > 1) {
                                     if (yDistance < 0 && imgPosTop < 0) {
