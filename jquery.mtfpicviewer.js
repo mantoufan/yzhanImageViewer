@@ -113,7 +113,7 @@
                         }
                         $picViewer.on('mousemove touchmove', throttle(function(e) {
                             movedDistance = onMovingPicViewer(e, start);
-                        }, 36));
+                        }, 16));
                         $(window).on('mouseup touchend', function() {
                             onMoveEndWindow(start, movedDistance)
                         });
