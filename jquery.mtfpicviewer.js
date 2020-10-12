@@ -24,6 +24,7 @@
                     attrSelector: opt.attrSelector || 'src',
                     parentSelector: opt.parentSelector,
                     className: opt.className,
+                    reverseDrag: $.extend({x: false, y: false}, opt.reverseDrag),
                     onChange: opt.onChange,
                     onOpen: opt.onOpen,
                     onClose: opt.onClose,
@@ -132,7 +133,7 @@
                     } else {
                         var imgPosLeft = $img.position().left, imgPosTop = $img.position().top,
                             x = getXY(e, 'x'), y = getXY(e, 'y'), scale = $img.data('scale') || 1, isMoving = true;
-                            xDistance = x - start.x, yDistance = y - start.y;
+                            xDistance = reverseDrag['x'] ? start.x - x : x - start.x, yDistance =  reverseDrag['x'] ? start.y - y : y - start.y;
                             if (xDistance || yDistance) {
                                 if (scale > 1) {
                                     if (yDistance < 0 && imgPosTop < 0) {
