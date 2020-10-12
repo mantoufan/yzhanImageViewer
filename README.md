@@ -50,7 +50,11 @@ $(areaSelector).mtfpicviewer({
     debug: false,
     onChange: function(curIndex, preIndex) {},
     onOpen: function(curIndex) {},
-    onClose: function(curIndex) {}
+    onClose: function(curIndex) {},
+    controls: {
+        reverseDrag: {x: true, y: true},
+        canChange: false
+    }
 });
 ```
 - `areaSelector` {jQuery选择器} 区域选择器
@@ -85,6 +89,11 @@ $(areaSelector).mtfpicviewer({
     - 点击返回，即 查看器关闭时，调用
     - 传入参数
         - curIndex 关闭前正在浏览的影像在`组`内的索引值
+- `controls` {对象} 控件参数 [设置查看器功能] 可选 1.0.1版本新增
+    - `reverseDrag` {对象} 影像移动方向 与 滑动及拖拽方向 方向，默认 与Windows设备体验相同，反向后与 苹果设备 体验相同
+        - `x` {布尔值} false（默认） | true 水平方向是否反向
+        - `y` {布尔值} false（默认） | true 竖直方向是否反向
+    - `canChange` {布尔值} true（默认） | false 是否允许切换
 ### 图示
 层级关系：areaSelector > parentSelector > selector
 ![](https://i.loli.net/2020/09/14/eaiZSQAsBDHxGpN.jpg)
