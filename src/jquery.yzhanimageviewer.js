@@ -1,24 +1,26 @@
-/*!
- * jQuery Plugin：jquery.mtfpicviewer.js 1.0.1
- * https://github.com/mantoufan/mtfPicViewer
+/*
+ * jQuery Plugin：jquery.yzhanImageViewer.js 1.0.2
+ * https://github.com/mantoufan/yzhanImageViewer
  *
  * Copyright 2020, 吴小宇 Shon Ng
  * https://github.com/mantoufan
  * 
- * Date: 2020-09-10T15:39Z
+ * Date: 2022-08-18T12:30Z
  */
 (function ($) {
-    var $picViewer = $('<div>').addClass('mtf-pic-viewer'),
-        $picViewerBg = $('<div>').addClass('mtf-pic-viewer-bg'),
-        $picList = $('<div>').addClass('mtf-pic-list').appendTo($picViewer),
-        $dotIndicator = $('<div>').addClass('mtf-dot-indicator').appendTo($picViewer),
-        $debug = $('<div>').addClass('mtf-debug').appendTo($picViewer),
-        $switchPrev = $('<div>').addClass('mtf-pic-switch mtf-pic-switch-prev').appendTo($picViewer),
-        $switchNext = $('<div>').addClass('mtf-pic-switch mtf-pic-switch-next').appendTo($picViewer),
+    var $imageViewer = $('<div>').addClass('yz-img-viewer'),
+        $imageViewerBg = $('<div>').addClass('yz-img-viewer-bg'),
+        $imageList = $('<div>').addClass('yz-img-list').appendTo($imageViewer),
+        $dotIndicator = $('<div>').addClass('yz-dot-indicator').appendTo($imageViewer),
+        $debug = $('<div>').addClass('yz-debug').appendTo($imageViewer),
+        $switchPrev = $('<div>').addClass('yz-img-switch yz-img-switch-prev').appendTo($imageViewer),
+        $switchNext = $('<div>').addClass('yz-img-switch yz-img-switch-next').appendTo($imageViewer),
+        $imageAll = null,
+        selector = '',
         data = {}
 
     $.fn.extend({
-        "mtfpicviewer": function (opt) {
+        "yzhanImageViewer": function (opt) {
             var opt = {
                     selector: opt.selector || 'img',
                     attrSelector: opt.attrSelector || 'src',
@@ -34,24 +36,24 @@
                     debug : opt.debug || false
                 }, clickTimer = null;
 
-                this.off('click').on('click', opt.selector, function(e) {
-                    var $current = $(this), $parent = $(e.delegateTarget), urls = [];
+                selector = opt.selector;
+
+                this.off('click').on('click', selector, function(e) {
+                    var $current = $(this), $parent = $(e.delegateTarget);
                     if (opt.parentSelector) {
                         $parent = $current.parents(opt.parentSelector).eq(0);
                     }
-                    $parent.find(opt.selector).each(function(index, ele) {
-                        urls.push($(ele).attr(opt.attrSelector));
-                    });
-                    $picViewer.attr('class' , 'mtf-pic-viewer' + (opt.className && ' ' + opt.className || ''));
+                    $imageViewer.attr('class' , 'yz-img-viewer' + (opt.className && ' ' + opt.className || ''));
                     opt.debug ? $debug.show() : $debug.hide();
-                    $.fn.mtfpicviewer.open({
-                        currentUrl: $current.attr(opt.attrSelector),
-                        urls: opt.controls.canChange ? urls : [$current.attr(opt.attrSelector)],
-                        onOpen: opt.onOpen
+                    $.fn.yzhanImageViewer.open({
+                        $current: $current,
+                        $all: $imageAll = opt.controls.canChange ? $parent.find(selector) : $current,
+                        onOpen: opt.onOpen,
+                        attrSelector: opt.attrSelector
                     });
-                    $picViewer.off('click').on('click', onClickPicViewer);
-                    $picViewer.off('mousedown touchstart mousemove').on('mousedown touchstart', onMoveStartPicViewer);
-                    $picList.off('dblclick mousemove touchend').on('mousemove touchend', throttle(displayControl, 99, true)).on('dblclick', 'div', onDblclickPicList);
+                    $imageViewer.off('click').on('click', onClickImageViewer);
+                    $imageViewer.off('mousedown touchstart mousemove').on('mousedown touchstart', onMoveStartImageViewer);
+                    $imageList.off('dblclick mousemove touchend').on('mousemove touchend', throttle(displayControl, 99, true)).on('dblclick', 'div', onDblclickImageList);
                     displayControl(e, true);
                     $switchPrev.off('click').on('click', function(){return switchGo('prev')});
                     $switchNext.off('click').on('click', function(){return switchGo('next')});
@@ -72,10 +74,10 @@
                             switchGo('next');
                             break;
                         case 82: // R键 还原影像比例到100%
-                            scaleImg($picList.children('.current').children('img'), 1);
+                            scaleImg($imageList.children('.current').children('img'), 1);
                             break;
-                        case 27: // ESC键 退出PicViewer
-                            onClickPicViewer.call(this);
+                        case 27: // ESC键 退出ImageViewer
+                            onClickImageViewer.call(this);
                             break;
                         default:
                             break;
@@ -83,13 +85,13 @@
                 }
 
                 /**
-                 * 当PicViewer被点击时
+                 * 当 ImageViewer 被点击时
                  */
-                function onClickPicViewer() {
+                function onClickImageViewer() {
                     clearTimeout(clickTimer);
                     clickTimer = setTimeout(function() {
-                        $.fn.mtfpicviewer.close({
-                            selector: (opt.selector || '') + (opt.attrSelector ? ('[' + opt.attrSelector + '="' + $picList.children('.current').children('img').attr('src') + '"]') : ''),
+                        $.fn.yzhanImageViewer.close({
+                            $target: $imageAll.eq($imageList.children('.current').index()),
                             onClose: opt.onClose
                         });
                         $(window).off('keydown', onKeydownWindow);
@@ -97,14 +99,14 @@
                 }
 
                 /**
-                 * 当PicViewer被按下或触摸开始时
-                 * @param {c.Event} e Jquery封装后的事件对象
+                 * 当 ImageViewer 被按下或触摸开始时
+                 * @param {c.Event} e jQuery 封装后的事件对象
                  */
-                function onMoveStartPicViewer(e) {
-                    var $img = $picList.children('.current').children('img'), ts = e.originalEvent.touches, movedDistance = {x: 0, y: 0},
+                function onMoveStartImageViewer(e) {
+                    var $img = $imageList.children('.current').children('img'), ts = e.originalEvent.touches, movedDistance = {x: 0, y: 0},
                         start = {
                             $img: $img,
-                            imgMinLeft: $picViewer.width() - $img.width() * ($img.data('scale') || 1),
+                            imgMinLeft: $imageViewer.width() - $img.width() * ($img.data('scale') || 1),
                             imgMinTop: $(window).height() - $img.height() * ($img.data('scale') || 1),
                             x: getXY(e, 'x'), y: getXY(e, 'y')
                         }
@@ -115,20 +117,20 @@
                             })
                             start.e.pos = start.$img.position();
                         }
-                        $picViewer.on('mousemove touchmove', throttle(function(e) {
-                            movedDistance = onMovingPicViewer(e, start);
+                        $imageViewer.on('mousemove touchmove', throttle(function(e) {
+                            movedDistance = onMovingImageViewer(e, start);
                         }, 16));
                         $(window).on('mouseup touchend', function() {
                             onMoveEndWindow(start, movedDistance)
                         });
                 }
                 /**
-                 * 当PicViewer被拖动时
-                 * @param {c.Event} e Jquery封装后的事件对象
-                 * @param {Object} start 当PicViewer被按下或触摸开始时，获取 初始位置 的相关信息
+                 * 当 ImageViewer 被拖动时
+                 * @param {c.Event} e jQuery 封装后的事件对象
+                 * @param {Object} start 当 ImageViewer 被按下或触摸开始时，获取 初始位置 的相关信息
                  * @return {Object<{x:Number, y:Number}>} 返回被拖动的距离 x-水平方向，y-竖直方向
                  */
-                function onMovingPicViewer(e, start) {
+                function onMovingImageViewer(e, start) {
                     var $img = start.$img, ts = e.originalEvent.touches, xDistance = 0, yDistance = 0;
                     if (ts && ts.length === 2) {// 双指缩放
                         var newDistance = Math.sqrt(Math.pow(ts[1].clientX - ts[0].clientX, 2) + Math.pow(ts[1].clientY - ts[0].clientY, 2));   
@@ -157,7 +159,7 @@
                                 start.x = x;
                                 start.y = y;
                                 if (isMoving === false) {
-                                    $picList.css('marginLeft', parseFloat($picList.css('marginLeft')) - xDistance + 'px');
+                                    $imageList.css('marginLeft', parseFloat($imageList.css('marginLeft')) - xDistance + 'px');
                                 }
                             }
                     }
@@ -167,12 +169,12 @@
                     }
                 }
                 /**
-                 * 当PicViewer被拖动开始时
-                 * @param {Object} start 当PicViewer被按下或触摸开始时，获取 初始位置 的相关信息
-                 * @param {Object<{x:Number, y:Number}>} movedDistance 当PicViewer被拖动时，被拖动的距离 x-水平方向，y-竖直方向
+                 * 当 ImageViewer 被拖动开始时
+                 * @param {Object} start 当 ImageViewer 被按下或触摸开始时，获取 初始位置 的相关信息
+                 * @param {Object<{x:Number, y:Number}>} movedDistance 当 ImageViewer 被拖动时，被拖动的距离 x-水平方向，y-竖直方向
                  */
                 function onMoveEndWindow(start, movedDistance) {
-                    var $img = start.$img, index = Math.round(- parseFloat($picList.css('marginLeft')) / $picList.width() + (movedDistance.x < 0 && -.35 || movedDistance.x > 0 && .25 || 0));
+                    var $img = start.$img, index = Math.round(- parseFloat($imageList.css('marginLeft')) / $imageList.width() + (movedDistance.x < 0 && -.35 || movedDistance.x > 0 && .25 || 0));
                     if(movedDistance.x !== 0 || movedDistance.y !== 0) {
                         setTimeout(function() {
                             clearTimeout(clickTimer);
@@ -181,36 +183,36 @@
                             }
                         }, 36);
                     }
-                    $.fn.mtfpicviewer.change({
+                    $.fn.yzhanImageViewer.change({
                         index: index,
                         onChange: opt.onChange
                     });
-                    $picViewer.off('mousemove touchmove');
+                    $imageViewer.off('mousemove touchmove');
                     $(window).off('mouseup touchend');
                 }
                 /**
-                 * 当PicList被双击时
-                 * @param {c.Event} e Jquery封装后的事件对象
+                 * 当ImageList被双击时
+                 * @param {c.Event} e jQuery 封装后的事件对象
                  */
-                function onDblclickPicList(e) {
+                function onDblclickImageList(e) {
                     var $img = $(this).children('img');
                         scaleImg($img, $img.data('scale') === 2 ? 1 : 2, e);
                         clearTimeout(clickTimer);
                 }
                 /**
-                 * 当PicList被双击时
-                 * @param {c.Event} e Jquery封装后的事件对象
+                 * 当ImageList被双击时
+                 * @param {c.Event} e jQuery 封装后的事件对象
                  * @param {Boolean} ignoreX 忽略鼠标指针或触摸点的X坐标，尝试显示切换按钮
                  */
                 function displayControl(e, ignoreX) {
-                    var ar = [$dotIndicator], x = e.clientX, picViewerOffsetLeft = $picViewer.offset().left, picViewerWidth_3 = $picViewer.width() / 3,
-                        len = $picList.children().length, index = $picList.children('.current').index(),
+                    var ar = [$dotIndicator], x = e.clientX, imageViewerOffsetLeft = $imageViewer.offset().left, imageViewerWidth_3 = $imageViewer.width() / 3,
+                        len = $imageList.children().length, index = $imageList.children('.current').index(),
                         isTouch = 'ontouchstart' in window;
                     if (!isTouch) {
-                        if (ignoreX || x < picViewerOffsetLeft + picViewerWidth_3) {
+                        if (ignoreX || x < imageViewerOffsetLeft + imageViewerWidth_3) {
                             index !== 0 && ar.push($switchPrev);
                         }
-                        if (ignoreX || x > picViewerOffsetLeft + picViewerWidth_3 * 2) {
+                        if (ignoreX || x > imageViewerOffsetLeft + imageViewerWidth_3 * 2) {
                             index < len - 1 && ar.push($switchNext);
                         }
                     } 
@@ -232,9 +234,9 @@
                  * 上下张切换：仅鼠标控制设备显示切换按钮，触屏不显示
                  */
                 function switchGo(type) {
-                    var index = $picList.children('.current').index();
+                    var index = $imageList.children('.current').index();
                         type === 'prev' ? index-- : index++;
-                        $.fn.mtfpicviewer.change({
+                        $.fn.yzhanImageViewer.change({
                             index: index,
                             onChange: opt.onChange
                         });
@@ -246,7 +248,7 @@
                  */
                 function onClickDotIndicator() {
                     var index = $(this).index();
-                    $.fn.mtfpicviewer.change({
+                    $.fn.yzhanImageViewer.change({
                         index: index,
                         onChange: opt.onChange
                     });
@@ -257,34 +259,36 @@
     
     /**
      * 打开：open
-     * @param {String} currentUrl 当前地址
-     * @param {Array} [urls] 所有地址数组
-     * @param {Function} [onOpen] 当picViewer被打开时触发
+     * @param {jQuey Object} $current 当前对象
+     * @param {jQuey Objects} $all 所有对象列表
+     * @param {Function} [onOpen] 当 ImageViewer 被打开时触发
+     * @param {String} attrSelector 对象地址的属性名
      */
-    $.fn.mtfpicviewer.open = function (opt) {
-        var currentUrl = opt.currentUrl,
-            urls = opt.urls || [opt.currentUrl],
+    $.fn.yzhanImageViewer.open = function (opt) {
+        var $current = opt.$current,
+            $all = opt.$all || $current,
             onOpen = opt.onOpen,
-            currentIndex = 0, currentClass, $target = $(window.event.target), imgsLen = urls.length;
+            attrSelector = opt.attrSelector,
+            currentIndex = 0, currentClass, $target = $(window.event.target), imgsLen = $all.length;
             preventRollThrough(true);
-            $picList.empty();
+            $imageList.empty();
             $dotIndicator.empty();
-            $.each(urls, function(index, Url) {
-                if (currentUrl === Url) {
+            $all.each(function(index, cur) {
+                if ($current.get(0) === cur) {
                     currentIndex = index;
                     currentClass = 'current';
                 } else {
                     currentClass = '';
                 }
-                $('<div>').append($('<img>').attr('src', Url).mousedown(function(e){e.preventDefault()})).appendTo($picList).addClass(currentClass);
+                $('<div>').append($('<img>').attr('src', $(cur).attr(attrSelector)).mousedown(function(e){e.preventDefault()})).appendTo($imageList).addClass(currentClass);
                 imgsLen > 1 && $('<div>').appendTo($dotIndicator).addClass(currentClass);
             })
-            $picList.css('marginLeft', - currentIndex * 100 + '%');
+            $imageList.css('marginLeft', - currentIndex * 100 + '%');
             // 从触发事件的影像开始放大
             if ($target.length === 1) {
                 var scrollTop = $(window).scrollTop(), top = $target.offset().top - scrollTop, 
-                    left = $target.offset().left, width = parseInt($picViewer.css('maxWidth')) || $(window).width();
-                $picViewer.show().css({
+                    left = $target.offset().left, width = parseInt($imageViewer.css('maxWidth')) || $(window).width();
+                $imageViewer.show().css({
                     top: top,
                     left: left,
                     width: $target.width(),
@@ -305,24 +309,22 @@
                         height: '100%'
                     })
                 })
-                $picViewerBg.show();
-                onOpen && onOpen($picList.children('.current').index());
+                $imageViewerBg.show();
+                onOpen && onOpen($imageList.children('.current').index(), $.makeArray($imageList.find(selector)), $.makeArray($imageAll));
             }
     }
     /**
      * 关闭：close
-     * @param {String} [selector=img] 元素的选择器，关闭时，查看器逐渐缩小到这个元素
-     * @param {Function} [onClose] 当picViewer被关闭时触发
+     * @param {jQuery Object} $target 关闭时，查看器逐渐缩小到这个元素
+     * @param {Function} [onClose] 当 ImageViewer 被关闭时触发
      */
-    $.fn.mtfpicviewer.close = function (opt) {
-        var selector = opt.selector || '',
-            onClose = opt.onClose,
-            $target = $(selector) || [];
-        if ($target.length > 1) {
+    $.fn.yzhanImageViewer.close = function (opt) {
+        var $target = opt.$target || [], onClose = opt.onClose
+        if ($target.length >= 1) {
             var scrollTop = $(window).scrollTop(), top = $target.offset().top - scrollTop, left = $target.offset().left;
-            $picViewer.css({
+            $imageViewer.css({
                 right: 'auto',
-                left: $picViewer.offset().left,
+                left: $imageViewer.offset().left,
                 margin: 0
             }).animate({
                 top: top,
@@ -331,14 +333,14 @@
                 height: $target.height(),
                 opacity: .5,
             }, 500, function() {
-                $picViewer.hide();
+                $imageViewer.hide();
             });
         } else {
-            $picViewer.fadeOut();
+            $imageViewer.fadeOut();
         }
-        $picViewerBg.hide();
+        $imageViewerBg.hide();
         preventRollThrough(false);
-        onClose && onClose($picList.children('.current').index());
+        onClose && onClose($imageList.children('.current').index(), $.makeArray($imageList.find(selector)), $.makeArray($imageAll));
     }
 
     /**
@@ -346,30 +348,30 @@
      * @param {Integer} index 要跳转到第几张影像，从0开始
      * @param {Function} [onChange] 当影像切换时回调函数
      */
-    $.fn.mtfpicviewer.change = function (opt) {
+    $.fn.yzhanImageViewer.change = function (opt) {
         var index = opt.index,
             onChange = opt.onChange,
-            $current = $picList.children('.current'), currentIndex = $current.index(), len = $picList.children().length;
+            $current = $imageList.children('.current'), currentIndex = $current.index(), len = $imageList.children().length;
             index = Math.max(0, Math.min(index, len - 1));
-            $picList.stop(true, true).animate({'marginLeft': - index * 100 + '%'}, 300);
-            $picList.children('div').eq(index).addClass('current').siblings().removeClass('current');
+            $imageList.stop(true, true).animate({'marginLeft': - index * 100 + '%'}, 300);
+            $imageList.children('div').eq(index).addClass('current').siblings().removeClass('current');
             $dotIndicator.children('div').eq(index).addClass('current').siblings().removeClass('current');
             if (index !== currentIndex) {
                 scaleImg($current.children('img'), 1);
                 index === 0 && $switchPrev.hide();
                 index === len - 1 && $switchNext.hide();
-                onChange && onChange($picList.children('.current').index(), $current.index());
+                onChange && onChange($imageList.children('.current').index(), $current.index(), $.makeArray($imageList.find(selector)), $.makeArray($imageAll));
             }
     }
     
     /**
      * 获取鼠标指针或触摸位置的X或Y坐标
-     * @param {c.Event} e Jquery封装后的事件对象
+     * @param {c.Event} e jQuery 封装后的事件对象
      * @param {x|y} type 获取坐标名 
      */
     function getXY(e, type) {;
-        n = 'client' + type.toUpperCase();
-        return  (e[n] || getTouchCenterPos(e.originalEvent.touches)[n] || 0) - $picViewer.offset().left;
+        var n = 'client' + type.toUpperCase();
+        return  (e[n] || getTouchCenterPos(e.originalEvent.touches)[n] || 0) - $imageViewer.offset().left;
     }
 
     /**
@@ -391,9 +393,9 @@
     
     /**
      * 缩放影像
-     * @param {Jquey Object} $img 要设置的影像对象
+     * @param {jQuey Object} $img 要设置的影像对象
      * @param {Integer} rate 缩放比率
-     * @param {c.Event} [e] Jquery封装后的事件对象
+     * @param {c.Event} [e] jQuery 封装后的事件对象
      * @param {Boolean} [addon] 是否开启叠加放缩方式，保留元素当前的缩放比例，在此基础上继续放缩
      */
     function scaleImg($img, rate, e, addon) {
@@ -412,7 +414,7 @@
                 rate = rate < 0.5 && 0.5 || rate > 3 && 3 || rate;
             }
             var topDiffer = $(window).height() - $img.height() * rate,
-                leftDiffer = $picViewer.width() - $img.width() * rate,
+                leftDiffer = $imageViewer.width() - $img.width() * rate,
                 x = getXY(e, 'x'), y = getXY(e, 'y');
                 $debug.html('x:' + x + ' y:' + y);
                 $img.css({
@@ -455,5 +457,5 @@
             $('body').css('overflow', data.bodyOverflow);
         }
     }
-    $('body').append($picViewerBg).append($picViewer);
+    $('body').append($imageViewerBg).append($imageViewer);
 })(jQuery);

@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>mtfPicViewer Showcase</title>
-    <link rel="stylesheet" href="./jquery.mtfpicviewer.css">
+    <title>yzhanImageViewer Showcase</title>
+    <link rel="stylesheet" href="./src/jquery.yzhanimageviewer.css">
     <style>
         body {
             margin: 0;
             background-color: #f7f7f7;
         }
+
         .main {
             width: calc(100% - 20pt);
             max-width: 720px;
@@ -17,24 +19,29 @@
             padding: 5pt 10pt;
             background-color: #fff;
         }
+
         .main img {
             width: 100%;
             margin: 5pt 0;
             cursor: pointer;
         }
+
         .main img:hover {
             box-shadow: 5pt 5pt #f7f7f7;
         }
+
         .main p {
             margin: 5pt 0;
             font: 25pt fangsong;
             text-align: center;
         }
-        .pic-viewer {
+
+        .image-viewer {
             background-color: #fff;
         }
     </style>
 </head>
+
 <body>
     <div class="main">
         <div>
@@ -56,44 +63,60 @@
             <img src="https://i.loli.net/2020/09/13/ILkGbRfOKY9w3gy.jpg" alt="图片9">
             <img src="https://i.loli.net/2020/09/13/M8P4uUwoqsed9Ag.jpg" alt="图片10">
         </div>
+        <div>
+            <p>第四组：图片地址相同</p>
+            <img src="https://i.loli.net/2020/09/13/EJqR8UXHtypLhTa.jpg" alt="图片1">
+            <img src="https://i.loli.net/2020/09/13/EJqR8UXHtypLhTa.jpg" alt="图片2">
+            <img src="https://i.loli.net/2020/09/13/EJqR8UXHtypLhTa.jpg" alt="图片3">
+        </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/combine/npm/jquery@1.12.4,npm/hammer-touchemulator@0.0.2,npm/rgbaster@1.0.0"></script>
-    <script src="./jquery.mtfpicviewer.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/combine/npm/jquery@1.12.4,npm/hammer-touchemulator@0.0.2,npm/rgbaster@1.0.0"></script>
+    <script src="./src/jquery.yzhanimageviewer.js"></script>
     <script>
         /**
-         * 使用图片的主要颜色值设置mtfPicViewer背景色
-         * @param {Integer} curIndex 当前mtfPicViewer中图片的索引值
+         * 使用图片的主要颜色值设置 yzhanImageViewer 背景色
+         * @param {Integer} curIndex 当前 yzhanImageViewer 中图片的索引值
          */
-        function setBgWithDominantColor(curIndex) {
-            var img = $('.mtf-pic-list').children().eq(curIndex).children('img')[0];
-            if (img.src.indexOf('file://') === -1) {
-                RGBaster.colors(img, {
-                    paletteSize: 1,
-                    success: function(payload) {
-                        $('.mtf-pic-viewer').css('backgroundColor', payload.palette[0]);
-                    }
-                });
-            }
+        function setBgWithDominantColor(currentViewerImage) {
+            RGBaster.colors(currentViewerImage, {
+                paletteSize: 1,
+                success: function (payload) {
+                    $('.yz-img-viewer').css('backgroundColor', payload.palette[0]);
+                }
+            });
         }
-        $('.main').mtfpicviewer({
+        $('.main').yzhanImageViewer({
             selector: 'img',
             attrSelector: 'src',
             parentSelector: 'div',
-            className: 'pic-viewer',
+            className: 'img-viewer',
             debug: false,
-            onChange: function(curIndex, preIndex) {
-                // console.log(curIndex, preIndex); 获取当前对象的索引值 获取跳转前上一个对象的索引值
-                setBgWithDominantColor(curIndex);
+            onChange: function (curIndex, preIndex, viewerElements, socureElements) { // 当图片切换时回调
+                setBgWithDominantColor(viewerElements[curIndex]); // 识别当前元素（图片）的颜色
+                console.log('changed');
+                console.log('curIndex', curIndex); // 当前元素索引
+                console.log('preIndex', preIndex); // 切换前上一个元素索引
+                console.log('viewerElements', viewerElements); // 查看器中的元素数组（例如：查看器中的图片）
+                console.log('socureElements', socureElements); // 文档中的元素数组（例如：内容中的图片）
             },
-                onOpen: function(curIndex) {
-                setBgWithDominantColor(curIndex);
+            onOpen: function (curIndex, viewerElements, socureElements) { // 当查看器被打开时回调
+                setBgWithDominantColor(viewerElements[curIndex]); // 识别当前被点击元素（图片）的颜色
+                console.log('opened');
+                console.log('curIndex', curIndex); // 当前被点击元素的索引（例如：被点击的图片）
+                console.log('viewerElements', viewerElements); // 查看器中的元素数组（例如：查看器中的图片）
+                console.log('socureElements', socureElements); // 文档中的元素数组（例如：内容中的图片）
             },
-            onClose: function(curIndex) {
-                var $img = $('.mtf-pic-list').children().eq(curIndex).children('img');
-                $('html,body').animate({'scrollTop': $('img[src="' + $img.attr('src') + '"]').offset().top});
+            onClose: function (curIndex, viewerElements, socureElements) { // 当查看器被关闭时回调
+                console.log('curIndex', curIndex); // 当前被关闭元素的索引（例如：关闭查看器前正在浏览的图片）
+                console.log('closed');
+                console.log('viewerElements', viewerElements); // 查看器中的元素数组（例如：查看器中的图片）
+                console.log('socureElements', socureElements); // 文档中的元素数组（例如：内容中的图片）
+                $('html, body').animate({ 'scrollTop': $(socureElements[curIndex]).offset().top }); // 关闭查看器后，滚动到文档中对应的元素（图片）
             }
         });
         location.search.indexOf('touch=on') > -1 && TouchEmulator();
     </script>
 </body>
+
 </html>
