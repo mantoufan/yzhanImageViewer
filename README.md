@@ -33,8 +33,8 @@ https://mantoufan.github.io/yzhanImageViewer/?touch=on
 2. 再引入本插件
 - CDN
     ```
-    <link href="https://cdn.jsdelivr.net/npm/yzhanimageviewer@latest/dist/yzhanimageviewer.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/yzhanimageviewer@latest/dist/yzhanimageviewer.min.js"></scirpt>
+    <link href="https://cdn.jsdelivr.net/npm/yzhanimageviewer@latest/dist/jquery.yzhanimageviewer.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/yzhanimageviewer@latest/dist/jquery.yzhanimageviewer.min.js"></scirpt>
     ```
 - 下载到本地
 https://github.com/mantoufan/yzhanImageViewer/releases
