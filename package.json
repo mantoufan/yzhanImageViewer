@@ -1,7 +1,7 @@
 {
   "name": "yzhanimageviewer",
   "public": true,
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "给网站和H5应用增加 像微信朋友圈一样的看图功能，可看大图，双击双指缩放，滑动切换图片，点击返回。jQuery plugin for viewing images like Wechat Moments",
   "scripts": {
     "build": "uglifyjs ./src/jquery.yzhanimageviewer.js -o ./dist/jquery.yzhanimageviewer.min.js -m -c --ie8 --no-annotations && cleancss ./src/jquery.yzhanimageviewer.css -o ./dist/jquery.yzhanimageviewer.min.css",
