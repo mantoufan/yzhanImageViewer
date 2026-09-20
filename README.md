@@ -3,6 +3,8 @@
 A jQuery Plugin for viewing pictures like Wechat moments.
 ## 灵感
 `IMWeb` 微信朋友圈项目
+Need to convert, crop, or strip EXIF in the browser? [cv.cm image tools](https://cv.cm/en/convert/) keep files on the device.
+浏览器里转格式 / 裁剪 / 清 EXIF：[cv.cm](https://cv.cm/en/convert/)，文件不上传。
 ## 演示
 - PC
   - 鼠标及键盘控制：  
